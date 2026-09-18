@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { getHealth } from "@/lib/api";
+import MapView from "@/components/map/MapView";
 
 export default function Home() {
   const [apiStatus, setApiStatus] = useState("Checking...");
@@ -110,18 +111,8 @@ export default function Home() {
                 Interactive geospatial visualization
               </p>
 
-              <div className="mt-6 flex min-h-80 items-center justify-center rounded-xl border border-dashed border-cyan-400/30 bg-[#08111f]">
-                <div className="text-center">
-                  <div className="text-5xl text-cyan-300">◈</div>
-
-                  <p className="mt-4 font-medium text-cyan-200">
-                    3D Terrain Engine
-                  </p>
-
-                  <p className="mt-2 text-xs text-slate-500">
-                    Three.js integration coming next
-                  </p>
-                </div>
+              <div className="mt-6 min-h-80 overflow-hidden rounded-xl">
+                <MapView />
               </div>
             </div>
 
