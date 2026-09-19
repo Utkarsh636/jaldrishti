@@ -17,3 +17,35 @@ export async function getHealth(): Promise<HealthResponse> {
 
   return response.json();
 }
+
+export interface ScenarioCreate {
+  name: string;
+  dam_id: string;
+  water_volume: number;
+  breach_width: number;
+  breach_time: number;
+  simulation_duration: number;
+}
+
+export interface Scenario extends ScenarioCreate {
+  id: string;
+  status: string;
+}
+
+export async function createScenario(
+  data: ScenarioCreate
+): Promise<Scenario> {
+  const response = await fetch(`${API_BASE_URL}/scenarios/`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    throw new Error("Scenario creation failed");
+  }
+
+  return response.json();
+}

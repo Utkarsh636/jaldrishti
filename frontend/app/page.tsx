@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getHealth } from "@/lib/api";
+import { createScenario, getHealth } from "@/lib/api";
 import MapView from "@/components/map/MapView";
 
 export default function Home() {
@@ -9,6 +9,12 @@ export default function Home() {
   const [scenarioName, setScenarioName] = useState("");
   const [damName, setDamName] = useState("");
   const [volume, setVolume] = useState("");
+  const [breachWidth, setBreachWidth] = useState("20");
+  const [breachTime, setBreachTime] = useState("60");
+  const [simulationDuration, setSimulationDuration] = useState("3600");
+
+  const [message, setMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     async function checkBackend() {
@@ -23,12 +29,32 @@ export default function Home() {
     checkBackend();
   }, []);
 
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(
+    event: React.FormEvent<HTMLFormElement>
+  ) {
     event.preventDefault();
 
-    alert(
-      `Scenario: ${scenarioName}\nDam: ${damName}\nVolume: ${volume} m³`
-    );
+    setIsSubmitting(true);
+    setMessage("");
+
+    try {
+      const scenario = await createScenario({
+        name: scenarioName,
+        dam_id: damName,
+        water_volume: Number(volume),
+        breach_width: Number(breachWidth),
+        breach_time: Number(breachTime),
+        simulation_duration: Number(simulationDuration),
+      });
+
+      setMessage(
+        `Scenario created: ${scenario.id} | Status: ${scenario.status}`
+      );
+    } catch {
+      setMessage("Failed to create scenario. Check the backend.");
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -154,13 +180,54 @@ export default function Home() {
                   className="w-full rounded-lg border border-slate-700 bg-[#08111f] p-3 text-sm outline-none focus:border-cyan-400"
                 />
 
+                <input
+                  required
+                  type="number"
+                  min="0.1"
+                  step="any"
+                  value={breachWidth}
+                  onChange={(event) => setBreachWidth(event.target.value)}
+                  placeholder="Breach width (m)"
+                  className="w-full rounded-lg border border-slate-700 bg-[#08111f] p-3 text-sm outline-none focus:border-cyan-400"
+                />
+
+                <input
+                  required
+                  type="number"
+                  min="0.1"
+                  step="any"
+                  value={breachTime}
+                  onChange={(event) => setBreachTime(event.target.value)}
+                  placeholder="Breach formation time (s)"
+                  className="w-full rounded-lg border border-slate-700 bg-[#08111f] p-3 text-sm outline-none focus:border-cyan-400"
+                />
+
+                <input
+                  required
+                  type="number"
+                  min="0.1"
+                  step="any"
+                  value={simulationDuration}
+                  onChange={(event) =>
+                    setSimulationDuration(event.target.value)
+                  }
+                  placeholder="Simulation duration (s)"
+                  className="w-full rounded-lg border border-slate-700 bg-[#08111f] p-3 text-sm outline-none focus:border-cyan-400"
+                />
+
                 <button
                   type="submit"
                   className="w-full rounded-lg bg-cyan-400 p-3 text-sm font-semibold text-slate-950 hover:bg-cyan-300"
                 >
-                  Validate Scenario
+                  {isSubmitting ? "Creating..." : "Create Scenario"}
                 </button>
               </form>
+
+              {message && (
+                <p className="mt-4 break-all text-sm text-cyan-300">
+                  {message}
+                </p>
+              )}
             </div>
           </div>
         </section>
