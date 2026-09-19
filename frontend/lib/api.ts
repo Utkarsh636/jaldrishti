@@ -49,3 +49,15 @@ export async function createScenario(
 
   return response.json();
 }
+
+export async function getScenarios(): Promise<Scenario[]> {
+  const response = await fetch(`${API_BASE_URL}/scenarios/`, {
+    cache: "no-store",
+  });
+
+  if (!response.ok) {
+    throw new Error("Scenario list request failed");
+  }
+
+  return response.json();
+}

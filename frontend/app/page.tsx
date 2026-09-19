@@ -1,13 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { createScenario, getHealth } from "@/lib/api";
+import { createScenario, getHealth, getScenarios } from "@/lib/api";
+import type { Scenario } from "@/lib/api";
 import MapView from "@/components/map/MapView";
 
 export default function Home() {
   const [apiStatus, setApiStatus] = useState("Checking...");
   const [scenarioName, setScenarioName] = useState("");
   const [damName, setDamName] = useState("");
+  const [scenarios, setScenarios] = useState<Scenario[]>([]);
   const [volume, setVolume] = useState("");
   const [breachWidth, setBreachWidth] = useState("20");
   const [breachTime, setBreachTime] = useState("60");
@@ -15,6 +17,15 @@ export default function Home() {
 
   const [message, setMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  async function loadScenarios() {
+    try {
+      const data = await getScenarios();
+      setScenarios(data);
+    } catch {
+      console.error("Failed to load scenarios");
+    }
+  }
 
   useEffect(() => {
     async function checkBackend() {
@@ -27,6 +38,7 @@ export default function Home() {
     }
 
     checkBackend();
+    loadScenarios();
   }, []);
 
   async function handleSubmit(
@@ -109,7 +121,10 @@ export default function Home() {
 
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
             {[
-              ["Active Scenarios", "03"],
+              [
+                "Active Scenarios",
+                scenarios.length.toString().padStart(2, "0"),
+              ],
               ["Monitored Dams", "128"],
               ["Risk Assessments", "24"],
               ["System Status", apiStatus],
@@ -228,6 +243,43 @@ export default function Home() {
                   {message}
                 </p>
               )}
+
+              <div className="mt-8 rounded-xl border border-slate-700 bg-slate-900 p-6">
+                <h2 className="mb-4 text-xl font-semibold text-white">
+                  Recent Scenarios
+                </h2>
+
+                {scenarios.length === 0 ? (
+                  <p className="text-slate-400">No scenarios created yet.</p>
+                ) : (
+                  <div className="space-y-3">
+                    {scenarios.map((scenario) => (
+                      <div
+                        key={scenario.id}
+                        className="rounded-lg border border-slate-700 p-4"
+                      >
+                        <div className="flex items-center justify-between">
+                          <h3 className="font-medium text-white">
+                            {scenario.name}
+                          </h3>
+
+                          <span className="rounded-full bg-cyan-500/20 px-3 py-1 text-xs text-cyan-300">
+                            {scenario.status}
+                          </span>
+                        </div>
+
+                        <p className="mt-2 text-sm text-slate-400">
+                          Dam: {scenario.dam_id}
+                        </p>
+
+                        <p className="text-xs text-slate-500">
+                          ID: {scenario.id}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </section>
