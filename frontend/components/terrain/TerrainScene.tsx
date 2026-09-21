@@ -47,6 +47,7 @@ export default function TerrainScene() {
       <Canvas camera={{ position: [8, 8, 8], fov: 50 }}>
         <ambientLight intensity={0.6} />
         <directionalLight position={[5, 10, 5]} intensity={1} />
+        <pointLight position={[-5, 5, -5]} intensity={0.4} />
 
         <TerrainSurface />
 
