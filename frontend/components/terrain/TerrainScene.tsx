@@ -1,8 +1,9 @@
 "use client";
 
-import { Canvas } from "@react-three/fiber";
+import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls, Grid } from "@react-three/drei";
 import * as THREE from "three";
+import { useRef } from "react";
 
 function TerrainSurface() {
   const size = 10;
@@ -42,8 +43,21 @@ function TerrainSurface() {
 }
 
 function WaterSurface() {
+  const waterRef = useRef<THREE.Mesh>(null);
+
+  useFrame((_, delta) => {
+    if (waterRef.current) {
+      waterRef.current.scale.x += delta * 0.03;
+      waterRef.current.scale.y += delta * 0.03;
+    }
+  });
+
   return (
-    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.15, 0]}>
+    <mesh
+      ref={waterRef}
+      rotation={[-Math.PI / 2, 0, 0]}
+      position={[0, 0.15, 0]}
+    >
       <planeGeometry args={[4, 4]} />
       <meshStandardMaterial
         color="#2563eb"
