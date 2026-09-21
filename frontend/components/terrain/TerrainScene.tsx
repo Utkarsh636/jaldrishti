@@ -41,6 +41,19 @@ function TerrainSurface() {
   );
 }
 
+function WaterSurface() {
+  return (
+    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.15, 0]}>
+      <planeGeometry args={[4, 4]} />
+      <meshStandardMaterial
+        color="#2563eb"
+        transparent
+        opacity={0.6}
+      />
+    </mesh>
+  );
+}
+
 export default function TerrainScene() {
   return (
     <div className="h-[500px] w-full">
@@ -50,6 +63,7 @@ export default function TerrainScene() {
         <pointLight position={[-5, 5, -5]} intensity={0.4} />
 
         <TerrainSurface />
+        <WaterSurface />
 
         <Grid args={[20, 20]} />
         <OrbitControls />
