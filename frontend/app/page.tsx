@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { createScenario, getHealth, getScenarios } from "@/lib/api";
 import type { Scenario } from "@/lib/api";
 import MapView from "@/components/map/MapView";
+import TerrainScene from "@/components/terrain/TerrainScene";
 
 export default function Home() {
   const [apiStatus, setApiStatus] = useState("Checking...");
@@ -62,6 +63,10 @@ export default function Home() {
       setMessage(
         `Scenario created: ${scenario.id} | Status: ${scenario.status}`
       );
+      await loadScenarios();
+      setScenarioName("");
+      setDamName("");
+      setVolume("");
     } catch {
       setMessage("Failed to create scenario. Check the backend.");
     } finally {
@@ -155,6 +160,17 @@ export default function Home() {
               <div className="mt-6 min-h-80 overflow-hidden rounded-xl">
                 <MapView />
               </div>
+
+              <div className="mt-6 overflow-hidden rounded-xl border border-slate-800">
+                <div className="border-b border-slate-800 px-5 py-4">
+                  <h3 className="text-lg font-semibold">3D Terrain Preview</h3>
+                  <p className="text-xs text-slate-500">
+                    Interactive terrain visualization
+                  </p>
+                </div>
+
+                <TerrainScene />
+              </div>
             </div>
 
             <div className="rounded-2xl border border-slate-800 bg-[#0d1b2e] p-6">
@@ -232,6 +248,7 @@ export default function Home() {
 
                 <button
                   type="submit"
+                  disabled={isSubmitting}
                   className="w-full rounded-lg bg-cyan-400 p-3 text-sm font-semibold text-slate-950 hover:bg-cyan-300"
                 >
                   {isSubmitting ? "Creating..." : "Create Scenario"}
