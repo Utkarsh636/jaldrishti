@@ -2,11 +2,40 @@
 
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls, Grid } from "@react-three/drei";
+import * as THREE from "three";
 
 function TerrainSurface() {
+  const size = 10;
+  const segments = 40;
+
+  const geometry = new THREE.PlaneGeometry(
+    size,
+    size,
+    segments,
+    segments
+  );
+
+  const position = geometry.attributes.position;
+
+  for (let i = 0; i < position.count; i++) {
+    const x = position.getX(i);
+    const y = position.getY(i);
+
+    const height =
+      Math.sin(x * 1.2) * 0.4 +
+      Math.cos(y * 1.5) * 0.3;
+
+    position.setZ(i, height);
+  }
+
+  position.needsUpdate = true;
+  geometry.computeVertexNormals();
+
   return (
-    <mesh rotation={[-Math.PI / 2, 0, 0]}>
-      <planeGeometry args={[10, 10, 20, 20]} />
+    <mesh
+      geometry={geometry}
+      rotation={[-Math.PI / 2, 0, 0]}
+    >
       <meshStandardMaterial color="#294936" />
     </mesh>
   );
