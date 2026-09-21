@@ -48,8 +48,11 @@ function WaterSurface() {
 
   useFrame((_, delta) => {
     if (waterRef.current) {
-      waterRef.current.scale.x += delta * 0.03;
-      waterRef.current.scale.y += delta * 0.03;
+      const scale = waterRef.current.scale.x + delta * 0.03;
+
+      if (scale < 1.8) {
+        waterRef.current.scale.set(scale, scale, 1);
+      }
     }
   });
 
