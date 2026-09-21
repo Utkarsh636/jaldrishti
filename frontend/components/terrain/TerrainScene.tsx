@@ -1,7 +1,7 @@
 "use client";
 
 import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, Grid } from "@react-three/drei";
+import { OrbitControls, Grid, Html } from "@react-three/drei";
 import * as THREE from "three";
 import { useRef } from "react";
 
@@ -29,6 +29,7 @@ function TerrainSurface() {
     position.setZ(i, height);
   }
 
+  
   position.needsUpdate = true;
   geometry.computeVertexNormals();
 
@@ -68,16 +69,35 @@ function WaterSurface() {
   );
 }
 
+function TerrainLabels() {
+  return (
+    <>
+      <Html position={[-4, 1, -4]}>
+        <div className="rounded bg-black/70 px-2 py-1 text-xs text-white">
+          Dam Zone
+        </div>
+      </Html>
+
+      <Html position={[3, 1, 2]}>
+        <div className="rounded bg-black/70 px-2 py-1 text-xs text-white">
+          Impact Area
+        </div>
+      </Html>
+    </>
+  );
+}
+
 export default function TerrainScene() {
   return (
     <div className="h-[500px] w-full">
-      <Canvas camera={{ position: [8, 8, 8], fov: 50 }}>
+      <Canvas camera={{ position: [10, 10, 10], fov: 45 }}>
         <ambientLight intensity={0.6} />
         <directionalLight position={[5, 10, 5]} intensity={1} />
         <pointLight position={[-5, 5, -5]} intensity={0.4} />
 
         <TerrainSurface />
         <WaterSurface />
+        <TerrainLabels />
 
         <Grid args={[20, 20]} />
         <OrbitControls />
