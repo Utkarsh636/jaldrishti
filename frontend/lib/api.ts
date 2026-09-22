@@ -61,3 +61,15 @@ export async function getScenarios(): Promise<Scenario[]> {
 
   return response.json();
 }
+
+export async function queueSimulation() {
+  const response = await fetch(`${API_BASE_URL}/simulation/queue`, {
+    method: "POST",
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to queue simulation");
+  }
+
+  return response.json();
+}

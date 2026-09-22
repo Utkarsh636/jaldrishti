@@ -1,7 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { createScenario, getHealth, getScenarios } from "@/lib/api";
+import {
+  createScenario,
+  getHealth,
+  getScenarios,
+  queueSimulation,
+} from "@/lib/api";
 import type { Scenario } from "@/lib/api";
 import MapView from "@/components/map/MapView";
 import TerrainScene from "@/components/terrain/TerrainScene";
@@ -146,6 +151,16 @@ export default function Home() {
               </div>
             ))}
           </div>
+
+          <button
+            onClick={async () => {
+              const job = await queueSimulation();
+              alert(`Simulation queued: ${job.job_id}`);
+            }}
+            className="mt-6 rounded-lg bg-blue-600 px-4 py-2 text-white"
+          >
+            Run Simulation
+          </button>
 
           <div className="mt-8 grid gap-6 xl:grid-cols-2">
             <div className="rounded-2xl border border-slate-800 bg-[#0d1b2e] p-6">
