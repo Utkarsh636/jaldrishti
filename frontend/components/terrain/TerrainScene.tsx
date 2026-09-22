@@ -46,13 +46,12 @@ function TerrainSurface() {
 function WaterSurface() {
   const waterRef = useRef<THREE.Mesh>(null);
 
-  useFrame((_, delta) => {
+  useFrame(({ clock }) => {
     if (waterRef.current) {
-      const scale = waterRef.current.scale.x + delta * 0.03;
+      const time = clock.getElapsedTime();
+      const scale = 1 + (Math.sin(time * 0.5) + 1) * 0.15;
 
-      if (scale < 1.8) {
-        waterRef.current.scale.set(scale, scale, 1);
-      }
+      waterRef.current.scale.set(scale, scale, 1);
     }
   });
 
