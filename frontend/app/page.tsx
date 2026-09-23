@@ -1,11 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import type { FormEvent } from "react";
 import {
   createScenario,
   getHealth,
   getScenarios,
   runSimulation,
+  runSimulationFrames,
   SimulationResult,
 } from "@/lib/api";
 import type { Scenario } from "@/lib/api";
@@ -27,6 +29,9 @@ export default function Home() {
   const [simulation, setSimulation] =
     useState<SimulationResult | null>(null);
   const [isRunning, setIsRunning] = useState(false);
+  const [frames, setFrames] = useState<number[][][][] | null>(null);
+  const [currentStep, setCurrentStep] = useState(0);
+  const [isRunningFrames, setIsRunningFrames] = useState(false);
 
   async function loadScenarios() {
     try {
@@ -52,7 +57,7 @@ export default function Home() {
   }, []);
 
   async function handleSubmit(
-    event: React.FormEvent<HTMLFormElement>
+    event: FormEvent<HTMLFormElement>
   ) {
     event.preventDefault();
 
@@ -191,6 +196,69 @@ export default function Home() {
             </div>
           )}
 
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+            <div className="min-w-0 rounded-xl border border-slate-700 bg-slate-900 p-4 lg:col-span-2">
+              <h2 className="mb-4 text-lg font-semibold text-white">
+                3D Terrain & Flood Simulation
+              </h2>
+
+              <div className="h-[500px] w-full">
+                <TerrainScene
+                  waterGrid={
+                    frames
+                      ? frames[currentStep]
+                      : simulation?.water_grid
+                  }
+                />
+              </div>
+            </div>
+
+            <div className="h-fit rounded-xl border border-slate-700 bg-slate-900 p-4">
+              <h2 className="mb-4 text-lg font-semibold text-white">
+                Simulation Controls
+              </h2>
+
+              <button
+                onClick={async () => {
+                  try {
+                    setIsRunningFrames(true);
+
+                    const result = await runSimulationFrames(50, 20);
+
+                    setFrames(result.frames);
+                    setCurrentStep(0);
+                  } catch (error) {
+                    console.error(error);
+                  } finally {
+                    setIsRunningFrames(false);
+                  }
+                }}
+                className="rounded-lg bg-cyan-600 px-4 py-2 text-white"
+              >
+                {isRunningFrames ? "Generating..." : "Generate Flood Timeline"}
+              </button>
+
+              {frames && (
+                <div className="mt-4 rounded-lg border border-cyan-500/30 bg-cyan-500/10 p-4">
+                  <p className="text-sm text-cyan-400">
+                    Simulation Time: Step {currentStep}
+                  </p>
+
+                  <input
+                    type="range"
+                    min={0}
+                    max={frames.length - 1}
+                    value={currentStep}
+                    onChange={(event) =>
+                      setCurrentStep(Number(event.target.value))
+                    }
+                    className="mt-3 w-full"
+                  />
+                </div>
+              )}
+            </div>
+          </div>
+
           <div className="mt-8 grid gap-6 xl:grid-cols-2">
             <div className="rounded-2xl border border-slate-800 bg-[#0d1b2e] p-6">
               <h3 className="text-lg font-semibold">
@@ -205,16 +273,6 @@ export default function Home() {
                 <MapView />
               </div>
 
-              <div className="mt-6 overflow-hidden rounded-xl border border-slate-800">
-                <div className="border-b border-slate-800 px-5 py-4">
-                  <h3 className="text-lg font-semibold">3D Terrain Preview</h3>
-                  <p className="text-xs text-slate-500">
-                    Interactive terrain visualization
-                  </p>
-                </div>
-
-                <TerrainScene waterGrid={simulation?.water_grid} />
-              </div>
             </div>
 
             <div className="rounded-2xl border border-slate-800 bg-[#0d1b2e] p-6">

@@ -97,3 +97,28 @@ export async function runSimulation(
 
   return response.json();
 }
+
+export interface SimulationFramesResult {
+  status: string;
+  grid_size: number;
+  steps: number;
+  frames: number[][][][];
+}
+
+export async function runSimulationFrames(
+  size: number = 50,
+  steps: number = 20
+): Promise<SimulationFramesResult> {
+  const response = await fetch(
+    `${API_BASE_URL}/simulation/frames?size=${size}&steps=${steps}`,
+    {
+      method: "POST",
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("Simulation frames request failed");
+  }
+
+  return response.json();
+}
