@@ -89,7 +89,47 @@ function TerrainLabels() {
   );
 }
 
-export default function TerrainScene() {
+function WaterGrid({ waterGrid }: { waterGrid: number[][] }) {
+  const size = waterGrid.length;
+  const cellSize = 10 / size;
+
+  return (
+    <group position={[-5, 0.2, -5]}>
+      {waterGrid.map((row, z) =>
+        row.map((depth, x) => {
+          if (depth <= 0.001) return null;
+
+          const intensity = Math.min(depth * 5, 1);
+
+          return (
+            <mesh
+              key={`${x}-${z}`}
+              position={[
+                x * cellSize + cellSize / 2,
+                intensity * 0.15,
+                z * cellSize + cellSize / 2,
+              ]}
+              rotation={[-Math.PI / 2, 0, 0]}
+            >
+              <planeGeometry args={[cellSize, cellSize]} />
+              <meshStandardMaterial
+                color="#1683ff"
+                transparent
+                opacity={0.35 + intensity * 0.6}
+              />
+            </mesh>
+          );
+        })
+      )}
+    </group>
+  );
+}
+
+export default function TerrainScene({
+  waterGrid,
+}: {
+  waterGrid?: number[][];
+}) {
   return (
     <div className="h-[500px] w-full">
       <Canvas camera={{ position: [10, 10, 10], fov: 45 }}>
@@ -98,6 +138,7 @@ export default function TerrainScene() {
         <pointLight position={[-5, 5, -5]} intensity={0.4} />
 
         <TerrainSurface />
+        {waterGrid && <WaterGrid waterGrid={waterGrid} />}
         <WaterSurface />
         <TerrainLabels />
 

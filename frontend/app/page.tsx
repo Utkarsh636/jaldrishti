@@ -5,7 +5,8 @@ import {
   createScenario,
   getHealth,
   getScenarios,
-  queueSimulation,
+  runSimulation,
+  SimulationResult,
 } from "@/lib/api";
 import type { Scenario } from "@/lib/api";
 import MapView from "@/components/map/MapView";
@@ -23,6 +24,9 @@ export default function Home() {
 
   const [message, setMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [simulation, setSimulation] =
+    useState<SimulationResult | null>(null);
+  const [isRunning, setIsRunning] = useState(false);
 
   async function loadScenarios() {
     try {
@@ -154,13 +158,38 @@ export default function Home() {
 
           <button
             onClick={async () => {
-              const job = await queueSimulation();
-              alert(`Simulation queued: ${job.job_id}`);
+              try {
+                setIsRunning(true);
+
+                const result = await runSimulation(50);
+
+                setSimulation(result);
+              } catch (error) {
+                console.error(error);
+              } finally {
+                setIsRunning(false);
+              }
             }}
             className="mt-6 rounded-lg bg-blue-600 px-4 py-2 text-white"
           >
-            Run Simulation
+            {isRunning ? "Running..." : "Run Simulation"}
           </button>
+
+          {simulation && (
+            <div className="mt-4 rounded-lg border border-blue-500/30 bg-blue-500/10 p-4">
+              <p className="text-sm text-blue-400">
+                Simulation Completed
+              </p>
+
+              <p className="text-white">
+                Grid Size: {simulation.grid_size} × {simulation.grid_size}
+              </p>
+
+              <p className="text-white">
+                Maximum Water: {simulation.max_water.toFixed(4)}
+              </p>
+            </div>
+          )}
 
           <div className="mt-8 grid gap-6 xl:grid-cols-2">
             <div className="rounded-2xl border border-slate-800 bg-[#0d1b2e] p-6">
@@ -184,7 +213,7 @@ export default function Home() {
                   </p>
                 </div>
 
-                <TerrainScene />
+                <TerrainScene waterGrid={simulation?.water_grid} />
               </div>
             </div>
 

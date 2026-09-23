@@ -73,3 +73,27 @@ export async function queueSimulation() {
 
   return response.json();
 }
+
+export interface SimulationResult {
+  status: string;
+  grid_size: number;
+  max_water: number;
+  water_grid: number[][];
+}
+
+export async function runSimulation(
+  size: number = 50
+): Promise<SimulationResult> {
+  const response = await fetch(
+    `${API_BASE_URL}/simulation/run?size=${size}`,
+    {
+      method: "POST",
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("Simulation failed");
+  }
+
+  return response.json();
+}
