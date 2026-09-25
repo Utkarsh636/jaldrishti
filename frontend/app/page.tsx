@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
 import {
+  assessImpact,
   createScenario,
   getHealth,
   getScenarios,
@@ -10,7 +11,7 @@ import {
   runSimulationFrames,
   SimulationResult,
 } from "@/lib/api";
-import type { Scenario } from "@/lib/api";
+import type { ImpactResponse, Scenario } from "@/lib/api";
 import MapView from "@/components/map/MapView";
 import TerrainScene from "@/components/terrain/TerrainScene";
 
@@ -32,6 +33,7 @@ export default function Home() {
   const [frames, setFrames] = useState<number[][][][] | null>(null);
   const [currentStep, setCurrentStep] = useState(0);
   const [isRunningFrames, setIsRunningFrames] = useState(false);
+  const [impact, setImpact] = useState<ImpactResponse | null>(null);
 
   async function loadScenarios() {
     try {
@@ -238,6 +240,62 @@ export default function Home() {
                 {isRunningFrames ? "Generating..." : "Generate Flood Timeline"}
               </button>
 
+              <button
+                onClick={async () => {
+                  const result = await assessImpact(50);
+                  setImpact(result);
+                }}
+                className="mt-3 rounded-lg bg-emerald-600 px-4 py-2 text-white"
+              >
+                Assess Impact
+              </button>
+
+              {impact && (
+                <div className="mt-4 grid grid-cols-3 gap-3">
+                  <div className="rounded-lg border border-slate-700 p-3">
+                    <p className="text-xs text-slate-400">Impacted Cells</p>
+                    <p className="text-xl font-semibold text-white">
+                      {impact.impact.impacted_cells}
+                    </p>
+                  </div>
+
+                  <div className="rounded-lg border border-slate-700 p-3">
+                    <p className="text-xs text-slate-400">Max Depth</p>
+                    <p className="text-xl font-semibold text-white">
+                      {impact.impact.max_depth.toFixed(2)}
+                    </p>
+                  </div>
+
+                  <div className="rounded-lg border border-slate-700 p-3">
+                    <p className="text-xs text-slate-400">Flood Status</p>
+                    <p className="text-xl font-semibold text-white">
+                      {impact.impact.flood_detected ? "Detected" : "None"}
+                    </p>
+                  </div>
+
+                  <div className="rounded-lg border border-slate-700 p-3">
+                    <p className="text-xs text-slate-400">Low Depth</p>
+                    <p className="text-xl font-semibold text-white">
+                      {impact.impact.severity.low}
+                    </p>
+                  </div>
+
+                  <div className="rounded-lg border border-slate-700 p-3">
+                    <p className="text-xs text-slate-400">Medium Depth</p>
+                    <p className="text-xl font-semibold text-white">
+                      {impact.impact.severity.medium}
+                    </p>
+                  </div>
+
+                  <div className="rounded-lg border border-slate-700 p-3">
+                    <p className="text-xs text-slate-400">High Depth</p>
+                    <p className="text-xl font-semibold text-white">
+                      {impact.impact.severity.high}
+                    </p>
+                  </div>
+                </div>
+              )}
+
               {frames && (
                 <div className="mt-4 rounded-lg border border-cyan-500/30 bg-cyan-500/10 p-4">
                   <p className="text-sm text-cyan-400">
@@ -310,7 +368,7 @@ export default function Home() {
                   value={volume}
                   onChange={(event) => setVolume(event.target.value)}
                   placeholder="Release volume (m³)"
-                  className="w-full rounded-lg border border-slate-700 bg-[#08111f] p-3 text-sm outline-none focus:border-cyan-400"
+                  className="w-full rounded-lg bordder border-slate-700 bg-[#08111f] p-3 text-sm outline-none focus:border-cyan-400"
                 />
 
                 <input

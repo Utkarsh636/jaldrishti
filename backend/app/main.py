@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from backend.app.api.geo import router as geo_router
+from backend.app.api.impact import router as impact_router
 from backend.app.api.jobs import router as jobs_router
 from backend.app.api.scenarios import router as scenarios_router
 from backend.app.api.simulation import router as simulation_router
@@ -25,6 +26,7 @@ app.add_middleware(
 
 app.include_router(scenarios_router)
 app.include_router(geo_router)
+app.include_router(impact_router)
 app.include_router(jobs_router)
 app.include_router(simulation_router)
 app.include_router(terrain_router)

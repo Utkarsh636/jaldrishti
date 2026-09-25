@@ -122,3 +122,38 @@ export async function runSimulationFrames(
 
   return response.json();
 }
+
+export interface ImpactResult {
+  impacted_cells: number;
+  max_depth: number;
+  flood_detected: boolean;
+  depth_threshold: number;
+  severity: {
+    low: number;
+    medium: number;
+    high: number;
+  };
+}
+
+export interface ImpactResponse {
+  status: string;
+  grid_size: number;
+  impact: ImpactResult;
+}
+
+export async function assessImpact(
+  size: number = 50
+): Promise<ImpactResponse> {
+  const response = await fetch(
+    `${API_BASE_URL}/impact/assess?size=${size}`,
+    {
+      method: "POST",
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("Impact assessment failed");
+  }
+
+  return response.json();
+}
